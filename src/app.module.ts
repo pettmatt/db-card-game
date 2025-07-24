@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { DataSource } from "typeorm"
-import { Card } from "./entity/card.entity"
+import { Card } from "./card/card.entity"
 
 @Module({
 	imports: [
@@ -18,8 +18,6 @@ import { Card } from "./entity/card.entity"
 			retryDelay: 5000,
 		}),
 	],
-	// controllers: [AppController],s
-	// providers: [AppService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

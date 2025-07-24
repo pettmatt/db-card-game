@@ -1,10 +1,26 @@
 import { Module } from "@nestjs/common"
-import { AppController } from "./app.controller"
-import { AppService } from "./app.service"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { DataSource } from "typeorm"
+import { Card } from "./entity/card.entity"
 
 @Module({
-	imports: [],
-	controllers: [AppController],
-	providers: [AppService],
+	imports: [
+		TypeOrmModule.forRoot({
+			type: "mysql",
+			host: "localhost",
+			port: 3306,
+			username: "root",
+			password: "password",
+			database: "testdb",
+			entities: [Card],
+			synchronize: true, // Synchronize is for dev environment, otherwise it should be false
+			retryAttempts: 3,
+			retryDelay: 5000,
+		}),
+	],
+	// controllers: [AppController],s
+	// providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+	constructor(private dataSource: DataSource) {}
+}

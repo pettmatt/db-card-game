@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile-mysql
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5433:8080
+    env_file:
+      - .env
+    networks:
+      - db-network
+
+  sqlite:
+    image: keinos/sqlite3:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile-sqlite
+    volumes:
+      - ./data:/app/data
+      - ./init.sh:/docker-entrypoint-initdb.d/init.sh
+    command: sh -c "chmod -R 777 /app/data && /docker-entrypoint-initdb.d/init.sh"
+    ports:
+      - 5434:8080
+    env_file:
+      - .env
+    networks:
+      - db-network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080
+    volumes:
+      - ./:/var/www/html/data
+    depends_on:
+      - mysql
+      - sqlite
+    networks:
+      - db-network
+
+networks:
+  db-network:
+    driver: bridge

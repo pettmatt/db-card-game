@@ -1,2 +1,0 @@
-FROM keinos/sqlite3:latest
-LABEL Name=cardgame Version=0.0.1

@@ -3,8 +3,8 @@ import { AppModule } from "./app.module"
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
-	await app.listen(process.env.PORT ?? 3000)
+	await app.listen(process.env.PORT ?? 3003)
 }
 bootstrap()
-	.then(() => console.log(""))
-	.catch(() => console.log("Error occured on bootstrap"))
+	.then(() => console.log("Application started successfully"))
+	.catch((err) => console.log("Error occured:", err))

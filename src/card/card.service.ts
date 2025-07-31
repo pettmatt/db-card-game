@@ -21,7 +21,7 @@ export class CardService {
 		return this.cardRepository.findOneBy({ [property]: value })
 	}
 
-	async modify(id: number, replace: Card): Promise<boolean> {
+	async update(id: number, replace: Card): Promise<boolean> {
 		let card: Card | null = await this.cardRepository.findOneBy({ id })
 		let response = false
 
@@ -35,17 +35,17 @@ export class CardService {
 		return response
 	}
 
-	async add(card: Card): Promise<boolean> {
-		return this.cardRepository
+	async add(card: Card): Promise<string> {
+		return await this.cardRepository
 			.save<Card>(card)
-			.then(() => true)
-			.catch(() => false)
+			.then((record: Card) => `Record added: ${JSON.stringify(record)}`)
+			.catch((err) => "Error occured while adding a record: " + err)
 	}
 
-	async remove(id: number): Promise<boolean> {
+	async remove(id: number): Promise<string> {
 		return await this.cardRepository
 			.delete(id)
-			.then(() => true)
-			.catch(() => false)
+			.then((record) => `Record removed: ${JSON.stringify(record)}`)
+			.catch((err) => "Error occure while removing a record: " + err)
 	}
 }

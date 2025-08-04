@@ -76,7 +76,7 @@ describe("CardService + CardController", () => {
 					"id",
 					previousRecord.id,
 				)
-				expect(modResult).toBe(modResult.success)
+				expect(modResult.success).toBe(true)
 				expect(result.success).toBe(true)
 			}
 		})

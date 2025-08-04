@@ -7,7 +7,7 @@ export class CardController {
 	constructor(private cardRepository: CardService) {}
 
 	@Get("all")
-	findAll(): Promise<Card[]> {
+	findAll() {
 		return this.cardRepository.findAll()
 	}
 
@@ -15,7 +15,7 @@ export class CardController {
 	findOne(
 		@Param("property") property: string,
 		@Param("value") value: number | boolean,
-	): Promise<Card | null> {
+	) {
 		return this.cardRepository.findOne(property, value)
 	}
 

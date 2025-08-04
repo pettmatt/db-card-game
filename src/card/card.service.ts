@@ -1,7 +1,35 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { DeleteResult, Repository } from "typeorm"
 import { Card } from "./card.entity"
+
+export interface Body {
+	success: boolean
+	message?: string
+	record?: Card | Card[] | DeleteResult
+}
+
+function responseBody(
+	result: Card | Card[] | Error | DeleteResult,
+	message?: string,
+): Body {
+	const body: Body = { success: false }
+
+	if (!(result instanceof Error)) {
+		body.success = true
+
+		if (message) {
+			body.message = `Record ${message}: ${JSON.stringify(result)}`
+		} else {
+			body.record = result
+		}
+	} else {
+		const res = typeof result == "string" ? result : JSON.stringify(result)
+		body.message = `Error occured while ${message}: ${res}`
+	}
+
+	return body
+}
 
 @Injectable()
 export class CardService {
@@ -10,42 +38,45 @@ export class CardService {
 		private cardRepository: Repository<Card>,
 	) {}
 
-	findAll(): Promise<Card[]> {
-		return this.cardRepository.find()
+	findAll(): Promise<Body> {
+		return this.cardRepository
+			.find()
+			.then((result: Card[]) => responseBody(result))
+			.catch((err: Error) => responseBody(err, "fetching all"))
 	}
 
-	async findOne(
-		property: string,
-		value: number | boolean,
-	): Promise<Card | null> {
-		return this.cardRepository.findOneBy({ [property]: value })
+	async findOne(property: string, value: number | boolean): Promise<Body> {
+		return this.cardRepository
+			.findOneBy({ [property]: value })
+			.then((record: Card) => responseBody(record))
+			.catch((err: Error) => responseBody(err, "fetching one"))
 	}
 
-	async update(id: number, replace: Card): Promise<boolean> {
+	async update(id: number, replace: Card): Promise<Body> {
 		let card: Card | null = await this.cardRepository.findOneBy({ id })
-		let response = false
+		let response: Body = { success: false }
 
 		if (card) {
 			card = replace
 			response = await this.cardRepository
 				.save(card)
-				.then(() => (response = true))
+				.then((record: Card) => responseBody(record, "updated"))
 		}
 
 		return response
 	}
 
-	async add(card: Card): Promise<string> {
+	async add(card: Card): Promise<Body> {
 		return await this.cardRepository
 			.save<Card>(card)
-			.then((record: Card) => `Record added: ${JSON.stringify(record)}`)
-			.catch((err) => "Error occured while adding a record: " + err)
+			.then((record: Card) => responseBody(record))
+			.catch((err: Error) => responseBody(err, "adding a record"))
 	}
 
-	async remove(id: number): Promise<string> {
+	async remove(id: number): Promise<Body> {
 		return await this.cardRepository
 			.delete(id)
-			.then((record) => `Record removed: ${JSON.stringify(record)}`)
-			.catch((err) => "Error occure while removing a record: " + err)
+			.then((record: DeleteResult) => responseBody(record, "removed"))
+			.catch((err: Error) => responseBody(err, "removing a record"))
 	}
 }

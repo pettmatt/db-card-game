@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, type SetStateAction } from "react"
 import "./App.css"
 import { type State } from "./types/interfaces"
 import { fetchState } from "./services/requests"
@@ -19,19 +19,27 @@ function App() {
 	const [state, setState] = useState<State>()
 
 	useEffect(() => {
-		const currentState = fetchState()
-		if (state !== currentState) {
-			setState(currentState)
-		}
+		let initStarted = new Date()
+		fetchState()
+			.then(newState => {
+				if (state !== newState) {
+					setState(newState)
+					const passedTime = new Date().getTime() - initStarted.getTime()
+					console.log(`Initializing state took ${passedTime}ms`)
+				} else {
+					console.log("(App) No changes in state")
+				}
+			})
+			.catch(err => console.warn("(App) Couldn't fetch state:", err))
 	}, [])
 
 	useEffect(() => {
-		console.log("State changed", state)
+		console.log("(App) State changed", (state) ? state : "and has initial undefined value")
 	}, [state])
 
 	function progressState() {
-		let currentPhase = state?.phase
-		setState((prevState: State) => ({
+		const currentPhase = state?.phase
+		setState((prevState: SetStateAction<State | undefined>) => ({
 			...prevState,
 			phase: (currentPhase >= 4) ? 1 : prevState.phase + 1
 		}))
@@ -50,7 +58,7 @@ function App() {
 
 	return (
 		<main>
-			<h2>State declared incorrectly</h2>
+			<h2>State declared probably incorrectly</h2>
 		</main>
 	)
 }

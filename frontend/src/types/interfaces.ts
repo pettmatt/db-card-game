@@ -1,14 +1,21 @@
+export interface Card {
+	id: number
+	value: number
+	hasSeen: boolean
+	markedToBeDestroyed: boolean
+}
+
 export interface Board {
-	current: Object[]
-	previousRounds: Object[][]
+	current: Card[]
+	previousRounds: Card[][]
 }
 
 export interface Match {
 	round: number
-	hand: Object[]
-	dealer_actions: Object[]
-	board: Board
-	stats: Object
+	hand?: Card[]
+	deck?: Card[]
+	board?: Board
+	stats?: Object
 }
 
 export interface State {

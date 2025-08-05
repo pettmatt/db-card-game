@@ -7,7 +7,7 @@ export default function Starting(props: GeneralProps) {
 
 	return (
 		<div>
-			<button onClick={progress}>Start</button>
+			<button onClick={() => props.progress}>Start</button>
 			{/* <button onClick={progress}>Leaderboard</button> */}
 		</div>
 	)

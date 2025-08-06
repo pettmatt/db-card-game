@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DeleteResult, Repository } from "typeorm"
-import { Card } from "./card.entity"
+import { Match } from "./match.entity"
 
 export interface Body {
 	success: boolean
 	message?: string
-	record?: Card | Card[] | DeleteResult
+	record?: Match | Match[] | DeleteResult
 }
 
 function responseBody(
-	result: Card | Card[] | Error | DeleteResult,
+	result: Match | Match[] | Error | DeleteResult,
 	message?: string,
 ): Body {
 	const body: Body = { success: false }
@@ -32,49 +32,49 @@ function responseBody(
 }
 
 @Injectable()
-export class CardService {
+export class MatchService {
 	constructor(
-		@InjectRepository(Card)
-		private cardRepository: Repository<Card>,
+		@InjectRepository(Match)
+		private matchRepository: Repository<Match>,
 	) {}
 
-	findAll(): Promise<Body> {
-		return this.cardRepository
+	async findAll(): Promise<Body> {
+		return this.matchRepository
 			.find()
-			.then((result: Card[]) => responseBody(result))
+			.then((result: Match[]) => responseBody(result))
 			.catch((err: Error) => responseBody(err, "fetching all"))
 	}
 
 	async findOne(property: string, value: number | boolean): Promise<Body> {
-		return this.cardRepository
+		return this.matchRepository
 			.findOneBy({ [property]: value })
-			.then((record: Card) => responseBody(record))
+			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "fetching one"))
 	}
 
-	async update(id: number, replace: Card): Promise<Body> {
-		let card: Card | null = await this.cardRepository.findOneBy({ id })
+	async update(id: number, replace: Match): Promise<Body> {
+		let match: Match | null = await this.matchRepository.findOneBy({ id })
 		let response: Body = { success: false }
 
-		if (card) {
-			card = replace
-			response = await this.cardRepository
-				.save(card)
-				.then((record: Card) => responseBody(record, "updated"))
+		if (match) {
+			match = replace
+			response = await this.matchRepository
+				.save(match)
+				.then((record: Match) => responseBody(record, "updated"))
 		}
 
 		return response
 	}
 
-	async add(card: Card): Promise<Body> {
-		return await this.cardRepository
-			.save<Card>(card)
-			.then((record: Card) => responseBody(record))
+	async add(match: Match): Promise<Body> {
+		return await this.matchRepository
+			.save<Match>(match)
+			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "adding a record"))
 	}
 
 	async remove(id: number): Promise<Body> {
-		return await this.cardRepository
+		return await this.matchRepository
 			.delete(id)
 			.then((record: DeleteResult) => responseBody(record, "removed"))
 			.catch((err: Error) => responseBody(err, "removing a record"))

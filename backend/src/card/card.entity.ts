@@ -1,4 +1,7 @@
 import { randomInt } from "crypto"
+import { Dealer } from "src/dealer/dealer.entity"
+import { Deck } from "src/deck/deck.entity"
+import { Hand } from "src/hand/hand.entity"
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
@@ -14,4 +17,16 @@ export class Card {
 
 	@Column({ default: false })
 	markedToBeDestroyed: boolean
+
+	@Column()
+	ownerId: number
+
+	@Column()
+	ownerType: string
+
+	owner: Deck | Dealer | Hand
+	setOwner(owner: Deck | Dealer | Hand) {
+		this.ownerId = owner.id
+		this.ownerType = owner.constructor.name
+	}
 }

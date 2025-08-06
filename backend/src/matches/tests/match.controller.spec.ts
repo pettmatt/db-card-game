@@ -1,14 +1,14 @@
-import { Test, TestingModule } from "@nestjs/testing"
-import { CardController } from "../card.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { CardService } from "../card.service"
-import { Card } from "../card.entity"
-import { Body } from "../card.service"
+import { Test, TestingModule } from "@nestjs/testing"
+import { MatchController } from "../match.controller"
+import { MatchService } from "../match.service"
+import { Match } from "../match.entity"
+import { Body } from "../match.service"
 
-describe("CardService + CardController", () => {
-	let service: CardService
-	let controller: CardController
-	let previousRecord: Card
+describe("MatchService + MatchController", () => {
+	let service: MatchService
+	let controller: MatchController
+	let previousRecord: Match
 
 	beforeEach(async () => {
 		const db = TypeOrmModule.forRoot({
@@ -18,18 +18,18 @@ describe("CardService + CardController", () => {
 			username: "root",
 			password: "root",
 			database: "gamedb",
-			entities: [Card],
+			entities: [Match],
 			synchronize: true,
 		})
 
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [db, TypeOrmModule.forFeature([Card])],
-			providers: [CardService],
-			controllers: [CardController],
+			imports: [db, TypeOrmModule.forFeature([Match])],
+			providers: [MatchService],
+			controllers: [MatchController],
 		}).compile()
 
-		service = module.get<CardService>(CardService)
-		controller = module.get<CardController>(CardController)
+		service = module.get<MatchService>(MatchService)
+		controller = module.get<MatchController>(MatchController)
 	})
 
 	it("service should be defined", () => {
@@ -47,10 +47,11 @@ describe("CardService + CardController", () => {
 	})
 
 	describe("Add a record", () => {
-		it("should reutrn the record when added", async () => {
-			const card: Card = new Card()
-			previousRecord = card
+		it("should return the record when added", async () => {
+			const match: Match = new Match()
+			previousRecord = match
 			const result = await controller.add(previousRecord)
+			console.log("RES", result)
 			expect(result.success).toBe(true)
 		})
 	})
@@ -67,7 +68,7 @@ describe("CardService + CardController", () => {
 	describe("Modify one record", () => {
 		it("should modify the existing record", async () => {
 			if (previousRecord) {
-				previousRecord.markedToBeDestroyed = true
+				previousRecord.finished = true
 				const modResult: Body = await controller.modify(
 					previousRecord.id,
 					previousRecord,

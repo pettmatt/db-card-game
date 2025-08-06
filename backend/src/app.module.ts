@@ -1,12 +1,12 @@
+import { DataSource } from "typeorm"
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { DataSource } from "typeorm"
-import { Card } from "./card/card.entity"
-import { CardsModule } from "./card/cards.module"
+import { MatchModule } from "./matches/match.module"
+import { Match } from "./matches/match.entity"
 
 @Module({
 	imports: [
-		CardsModule,
+		MatchModule,
 		TypeOrmModule.forRoot({
 			type: "mysql",
 			host: "127.0.0.1",
@@ -14,7 +14,7 @@ import { CardsModule } from "./card/cards.module"
 			username: "root",
 			password: "root",
 			database: "gamedb",
-			entities: [Card],
+			entities: [Match],
 			synchronize: true, // Synchronize is for dev environment, otherwise it should be false
 			retryAttempts: 3,
 			retryDelay: 5000,

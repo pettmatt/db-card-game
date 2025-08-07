@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm"
 import { randomInt } from "crypto"
+import { Match } from "../match/match.entity"
 
 // interface WinningCondition {
 // 	[key: string]: any
@@ -15,4 +16,7 @@ export class Dealer {
 
 	@Column()
 	winningCondition: string
+
+	@OneToOne(() => Match, (match) => match.dealer)
+	match: Match
 }

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm"
 import { randomInt } from "crypto"
+import { Match } from "../match/match.entity"
 
 @Entity()
 export class Hand {
@@ -8,4 +9,7 @@ export class Hand {
 
 	@Column({ default: randomInt(3, 6) })
 	maxLength: number
+
+	@OneToOne(() => Match, (match) => match.hand)
+	match: Match
 }

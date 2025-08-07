@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm"
 import { randomInt } from "crypto"
+import { Match } from "../match/match.entity"
 
 @Entity()
 export class Deck {
@@ -8,4 +9,7 @@ export class Deck {
 
 	@Column({ default: randomInt(15, 60) })
 	maxLength: number
+
+	@OneToOne(() => Match, (match) => match.deck)
+	match: Match
 }

@@ -2,14 +2,16 @@ import { DataSource } from "typeorm"
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { MatchModule } from "./match/match.module"
+import { CardModule } from "./card/card.module"
+import { Dealer } from "./dealer/dealer.entity"
 import { Match } from "./match/match.entity"
 import { Card } from "./card/card.entity"
 import { Deck } from "./deck/deck.entity"
 import { Hand } from "./hand/hand.entity"
-import { Dealer } from "./dealer/dealer.entity"
 
 @Module({
 	imports: [
+		CardModule,
 		MatchModule,
 		TypeOrmModule.forRoot({
 			type: "mysql",
@@ -26,7 +28,5 @@ import { Dealer } from "./dealer/dealer.entity"
 	],
 })
 export class AppModule {
-	constructor(private dataSource: DataSource) {
-		this.dataSource = dataSource
-	}
+	constructor(private dataSource: DataSource) {}
 }

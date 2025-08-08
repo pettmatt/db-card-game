@@ -1,22 +1,30 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
-import { CardRepository } from "./card.repository"
+import { Controller, Param, Body, Get, Post, Put, Delete } from "@nestjs/common"
+import { CardService } from "./card.service"
 import { Card } from "./card.entity"
 
 @Controller("card")
-export class MatchController {
-	constructor(private cardRepository: CardRepository) {}
+export class CardController {
+	constructor(private cardRepository: CardService) {}
+
+	@Get("all")
+	findAll() {
+		return this.cardRepository.findAll()
+	}
 
 	@Get("all/:ownerId/:ownerType")
-	findAll(
+	findAllByOwner(
 		@Param("ownerId") ownerId: number,
 		@Param("ownerType") ownerType: string,
 	) {
 		return this.cardRepository.findByOwner(ownerId, ownerType)
 	}
 
-	@Get(":id")
-	findOne(@Param("id") id: number) {
-		return this.cardRepository.findById(id)
+	@Get(":property/:value")
+	findOne(
+		@Param("property") property: string,
+		@Param("value") value: number,
+	) {
+		return this.cardRepository.findBy(property, value)
 	}
 
 	@Post(":ownerId/:ownerType")
@@ -39,6 +47,6 @@ export class MatchController {
 
 	@Delete(":id")
 	remove(@Param("id") id: number) {
-		return this.cardRepository.delete(id)
+		return this.cardRepository.remove(id)
 	}
 }

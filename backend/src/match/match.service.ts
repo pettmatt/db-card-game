@@ -2,34 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DeleteResult, Repository } from "typeorm"
 import { Match } from "./match.entity"
-
-export interface Body {
-	success: boolean
-	message?: string
-	record?: Match | Match[] | DeleteResult
-}
-
-function responseBody(
-	result: Match | Match[] | Error | DeleteResult,
-	message?: string,
-): Body {
-	const body: Body = { success: false }
-
-	if (!(result instanceof Error)) {
-		body.success = true
-
-		if (message) {
-			body.message = `Record ${message}: ${JSON.stringify(result)}`
-		} else {
-			body.record = result
-		}
-	} else {
-		const res = typeof result == "string" ? result : JSON.stringify(result)
-		body.message = `Error occured while ${message}: ${res}`
-	}
-
-	return body
-}
+import { type Body, responseBody } from "../utils/service"
 
 @Injectable()
 export class MatchService {
@@ -38,23 +11,29 @@ export class MatchService {
 		private matchRepository: Repository<Match>,
 	) {}
 
-	async findAll(): Promise<Body> {
+	async findAll(): Promise<Body<Match | Error>> {
 		return this.matchRepository
 			.find()
 			.then((result: Match[]) => responseBody(result))
 			.catch((err: Error) => responseBody(err, "fetching all"))
 	}
 
-	async findOne(property: string, value: number | boolean): Promise<Body> {
+	async findOne(
+		property: string,
+		value: number | boolean | string,
+	): Promise<Body<Match | Error>> {
 		return this.matchRepository
 			.findOneBy({ [property]: value })
 			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "fetching one"))
 	}
 
-	async update(id: number, replace: Match): Promise<Body> {
+	async update(id: number, replace: Match): Promise<Body<Match>> {
 		let match: Match | null = await this.matchRepository.findOneBy({ id })
-		let response: Body = { success: false }
+		let response: Body<Match> = {
+			success: false,
+			message: `Record "${id}" doesn't exists`,
+		}
 
 		if (match) {
 			match = replace
@@ -66,15 +45,15 @@ export class MatchService {
 		return response
 	}
 
-	async add(match: Match): Promise<Body> {
-		return await this.matchRepository
+	async add(match: Match): Promise<Body<Match | Error>> {
+		return this.matchRepository
 			.save<Match>(match)
 			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "adding a record"))
 	}
 
-	async remove(id: number): Promise<Body> {
-		return await this.matchRepository
+	async remove(id: number): Promise<Body<Match | Error | DeleteResult>> {
+		return this.matchRepository
 			.delete(id)
 			.then((record: DeleteResult) => responseBody(record, "removed"))
 			.catch((err: Error) => responseBody(err, "removing a record"))

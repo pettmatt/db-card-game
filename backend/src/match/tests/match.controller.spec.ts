@@ -3,7 +3,7 @@ import { Test, TestingModule } from "@nestjs/testing"
 import { MatchController } from "../match.controller"
 import { MatchService } from "../match.service"
 import { Match } from "../match.entity"
-import { Body } from "../match.service"
+import { Body } from "../../utils/service"
 import { Card } from "../../card/card.entity"
 import { Deck } from "../../deck/deck.entity"
 import { Hand } from "../../hand/hand.entity"
@@ -77,11 +77,11 @@ describe("MatchService + MatchController", () => {
 		it("should modify the existing record", async () => {
 			if (previousRecord) {
 				previousRecord.finished = true
-				const modResult: Body = await controller.modify(
+				const modResult: Body<Match> = await controller.modify(
 					previousRecord.id,
 					previousRecord,
 				)
-				const result: Body = await controller.findOne(
+				const result: Body<Match | Error> = await controller.findOne(
 					"id",
 					previousRecord.id,
 				)

@@ -18,10 +18,10 @@ export class Card {
 	@Column({ default: false })
 	markedToBeDestroyed: boolean
 
-	@Column()
+	@Column({ default: -1 })
 	ownerId: number
 
-	@Column()
+	@Column({ default: "" })
 	ownerType: string
 
 	owner: Deck | Dealer | Hand

@@ -27,8 +27,13 @@ export class CardController {
 		return this.cardRepository.findBy(property, value)
 	}
 
+	@Post()
+	add(@Body() card?: Card) {
+		return this.cardRepository.add(card || new Card())
+	}
+
 	@Post(":ownerId/:ownerType")
-	add(
+	addWithOwner(
 		@Param("ownerId") ownerId: number,
 		@Param("ownerType") ownerType: string,
 		@Body() card?: Card,

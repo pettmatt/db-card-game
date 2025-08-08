@@ -24,15 +24,15 @@ export class Match {
 	@Column({ default: randomInt(3, 10) })
 	maxRounds: number
 
-	@OneToOne(() => Deck)
+	@OneToOne(() => Deck, { cascade: true })
 	@JoinColumn()
 	deck: Deck
 
-	@OneToOne(() => Hand)
+	@OneToOne(() => Hand, { cascade: true })
 	@JoinColumn()
 	hand: Hand
 
-	@OneToOne(() => Dealer)
+	@OneToOne(() => Dealer, { cascade: true })
 	@JoinColumn()
 	dealer: Dealer
 }

@@ -14,7 +14,7 @@ export class Dealer {
 	@Column({ default: randomInt(4, 6) })
 	maxLength: number
 
-	@Column()
+	@Column({ default: "" })
 	winningCondition: string
 
 	@OneToOne(() => Match, (match) => match.dealer)

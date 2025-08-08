@@ -3,6 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { DeleteResult, Repository } from "typeorm"
 import { Match } from "./match.entity"
 import { type Body, responseBody } from "../utils/service"
+import { Hand } from "../hand/hand.entity"
+import { Dealer } from "../dealer/dealer.entity"
+import { Deck } from "../deck/deck.entity"
 
 @Injectable()
 export class MatchService {
@@ -46,8 +49,19 @@ export class MatchService {
 	}
 
 	async add(match: Match): Promise<Body<Match | Error>> {
+		const hand = new Hand()
+		const deck = new Deck()
+		const dealer = new Dealer()
+
+		const m = this.matchRepository.create({
+			...match,
+			hand,
+			deck,
+			dealer,
+		})
+
 		return this.matchRepository
-			.save<Match>(match)
+			.save(m)
 			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "adding a record"))
 	}

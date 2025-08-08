@@ -42,7 +42,7 @@ export interface Match {
 
 export interface State {
 	phase: number
-	match: Match
+	match: Match[]
 	leaderboard: object[]
 }
 

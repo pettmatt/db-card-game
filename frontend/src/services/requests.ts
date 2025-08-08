@@ -51,12 +51,7 @@ export async function fetchStateSection<T>(state: State, url: string, path: stri
 export async function fetchState(): Promise<State> {
 	const state: State = {
 		phase: 1,
-		match: {
-			round: 0,
-			hand: undefined,
-			deck: undefined,
-			stats: undefined
-		},
+		match: [],
 		leaderboard: [{}]
 	}
 
@@ -82,9 +77,11 @@ export function setMatchState(state: State): State {
 
 	setStateSection<Match>(state, matchUrl, ["match"], request)
 
-	if (state.match.deck) {
+	if (state.match) {
 		console.log("Generating cards")
-		const deckLength = state.match.deck
+		// Tweak later, so the index is fetched from browser. If not found the application should behave as if there are no matches
+		const index = (state.match.length > 1) ? 1 : 0
+		const deckLength = state.match[index].deck.maxLength
 
 		for (let i = 0; i < deckLength; i++) {
 			setStateSection(state, deckUrl, [], request)

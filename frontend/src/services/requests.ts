@@ -1,4 +1,5 @@
-import { type Card, type State } from "../types/interfaces"
+import { type Match, type Card, type State } from "../types/interfaces"
+import { setValue } from "../utils/general"
 
 interface Request<T> {
 	success: boolean
@@ -6,9 +7,14 @@ interface Request<T> {
 	record?: T
 }
 
-async function cfetch<T>(url: string): Promise<Request<T> | Error> {
+async function cfetch<T>(url: string, request?: RequestInit): Promise<Request<T> | Error> {
 	try {
-		const response: Response = await fetch(url)
+		if (!request) {
+			request = {}
+			request.method = "GET"
+		}
+
+		const response: Response = await fetch(url, request)
 
 		if (!response.ok) {
 			throw new Error(`(${response.status}) Request failed: ${response}`)
@@ -20,30 +26,73 @@ async function cfetch<T>(url: string): Promise<Request<T> | Error> {
 	}
 }
 
-export async function fetchState(): Promise<State> {
-	const deckUrl = `${import.meta.env.VITE_BACKEND_URL}/card/all`
+export async function setStateSection<T>(
+	state: State, url: string, path: string[], request: RequestInit
+) {
+	const data: Request<T> | Error = await cfetch<T>(url, request)
+	if (!(data instanceof Error)) {
+		if (data && data.success && data.record !== undefined) {
+			setValue(state, path, data.record)
+			console.log("State", path ,"set")
+		}
+	}
+}
 
+export async function fetchStateSection<T>(state: State, url: string, path: string[]) {
+	const data: Request<T> | Error = await cfetch<T>(url)
+	if (!(data instanceof Error)) {
+		if (data && data.success && data.record !== undefined) {
+			setValue(state, path, data.record)
+			console.log("State", path ,"set")
+		}
+	}
+}
+
+export async function fetchState(): Promise<State> {
 	const state: State = {
 		phase: 1,
 		match: {
 			round: 0,
 			hand: undefined,
 			deck: undefined,
-			board: {
-				current: [],
-				previousRounds: [[]]
-			},
 			stats: undefined
 		},
 		leaderboard: [{}]
 	}
 
-	const deckData: Request<Card[]> | Error = await cfetch<Card[]>(deckUrl)
-	if (!(deckData instanceof Error)) {
-		if (deckData && deckData.success && deckData.record !== undefined) {
-			state.match.deck = deckData.record
-			console.log("Deck state set")
+	const base = import.meta.env.VITE_BACKEND_URL
+	const deckUrl = `${base}/card/all`
+	const matchUrl = `${base}/match/all`
+
+	// Fetch matches and cards
+	fetchStateSection<Match[]>(state, matchUrl, ["match"])
+	fetchStateSection<Card[]>(state, deckUrl, ["match", "deck"])
+
+	return state
+}
+
+export function setMatchState(state: State): State {
+	const base = import.meta.env.VITE_BACKEND_URL
+	const deckUrl = `${base}/card`
+	const matchUrl = `${base}/match`
+
+	const request: RequestInit = {
+		method: "POST"
+	}
+
+	setStateSection<Match>(state, matchUrl, ["match"], request)
+
+	if (state.match.deck) {
+		console.log("Generating cards")
+		const deckLength = state.match.deck
+
+		for (let i = 0; i < deckLength; i++) {
+			setStateSection(state, deckUrl, [], request)
 		}
+
+		console.log("Finished generating cards")
+	} else {
+		console.warn("Cannot generate cards without successful Match instance (match):", state.match)
 	}
 
 	return state

@@ -79,7 +79,9 @@ export function setMatchState(state: State): State {
 
 	if (state.match) {
 		console.log("Generating cards")
-		// Tweak later, so the index is fetched from browser. If not found the application should behave as if there are no matches
+		// Tweak later, so the index is fetched from browser. If not found the application should behave as if there are no matches.
+		// It would be better if backend would require the index and only sends relevant match, buuut eh,
+		// this is just a little hobby project.
 		const index = (state.match.length > 1) ? 1 : 0
 		const deckLength = state.match[index].deck.maxLength
 

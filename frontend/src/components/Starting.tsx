@@ -1,3 +1,4 @@
+import { StatesEnum } from "../types/enums"
 import type { GeneralProps } from "../types/interfaces"
 
 export default function Starting(props: GeneralProps) {
@@ -5,10 +6,18 @@ export default function Starting(props: GeneralProps) {
 		return
 	}
 
+	function startClick() {
+		props.progress()
+	}
+
+	function leaderboardClick() {
+		props.progress(StatesEnum.Result)
+	}
+
 	return (
-		<div>
-			<button onClick={() => props.progress}>Start</button>
-			{/* <button onClick={progress}>Leaderboard</button> */}
+		<div className="flex">
+			<button onClick={startClick}>Start</button>
+			<button onClick={leaderboardClick}>Leaderboard</button>
 		</div>
 	)
 }

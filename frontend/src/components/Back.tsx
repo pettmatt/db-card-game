@@ -1,4 +1,3 @@
-import { StatesEnum } from "../types/enums"
 import type { GeneralProps } from "../types/interfaces"
 
 export default function Back(props: GeneralProps) {

@@ -2,12 +2,12 @@ import "./App.css"
 import { useState, useEffect, type SetStateAction } from "react"
 import { type State } from "./types/interfaces"
 import { StatesEnum } from "./types/enums"
-import { fetchState } from "./services/requests"
 import { stateValidator } from "./services/validate"
-import Result from "./components/Result"
-import Game from "./components/Game"
+import { fetchState } from "./services/state"
 import Continue from "./components/Continue"
 import Starting from "./components/Starting"
+import Result from "./components/Result"
+import Game from "./components/Game"
 import Back from "./components/Back"
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
 	useEffect(() => {
 		let initStarted = new Date()
 		fetchState()
-			.then(newState => {
+			.then((newState: State) => {
 				if (state !== newState) {
 					setState(newState)
 					const passedTime = new Date().getTime() - initStarted.getTime()
@@ -26,7 +26,7 @@ function App() {
 					console.log("(App) No changes in state")
 				}
 			})
-			.catch(err => console.warn("(App) Couldn't fetch state:", err))
+			.catch((error: Error) => console.warn("(App) Couldn't fetch state:", error))
 	}, [])
 
 	useEffect(() => {
@@ -72,7 +72,7 @@ function App() {
 				<Continue show={stateValidator(state, StatesEnum.Continue)} state={state} progress={progressState} />
 				<Game show={stateValidator(state, StatesEnum.Game)} state={state} progress={progressState} />
 				<Result show={stateValidator(state, StatesEnum.Result)} state={state} progress={progressState} />
-				<Back show={stateValidator(state, StatesEnum.Any)} state={state} progress={previousState}>back</Back>
+				<Back show={stateValidator(state, StatesEnum.Any)} state={state} progress={previousState} />
 			</main>
 		)
 	}

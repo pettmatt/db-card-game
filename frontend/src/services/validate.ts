@@ -2,11 +2,14 @@ import { StatesEnum } from "../types/enums"
 import { type State } from "../types/interfaces"
 
 export function stateValidator(state: State, value: number): boolean {
-	if (value === StatesEnum.Any && state.phase > StatesEnum.Starting) {
+	const current_phase = state.phase
+
+	// For back button, which is supposed to appear everywhere else, but in the start
+	if (value === StatesEnum.Any && current_phase > StatesEnum.Starting) {
 		return true
 	}
 
-	if (state.phase === value) {
+	if (current_phase === value) {
 		return true
 	}
 

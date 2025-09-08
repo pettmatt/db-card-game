@@ -59,23 +59,18 @@ export interface GeneralProps {
 	progress: Function
 }
 
-export interface GameProps extends GeneralProps {
-	id: number
-}
-
-export interface DealerProps {
-	state: State
-	actions: {
-		deal: {
-			target: number
-			cards: number
-		}
-	}
-}
-
 export interface GeneralGameProps {
 	state: State,
-	rules: GameRules | Blackjack
+	rules: GameRules | Blackjack | undefined // Remove undefined later
+}
+
+export interface DealerProps extends GeneralGameProps {
+	setupDone: Function,
+	roundActionDone: Function,
+}
+
+export interface PlayerProps extends GeneralGameProps {
+	roundActionDone: Function,
 }
 
 // Game
@@ -85,33 +80,31 @@ interface Ask {
 }
 
 export interface GameRules {
-	object: {
-		players: {
-			min: number,
-			max: number,
-			dealer: true
-		},
-		round: {
-			hand: {
-				card_orientation: object,
-				ask: {
-					message: string,
-					ask_state: object
-				}
-			},
-			dealer: {
-				hand: Ask,
-				action: object
+	players: {
+		min: number,
+		max: number,
+		dealer: true
+	},
+	round: {
+		hand: {
+			card_orientation: object,
+			ask: {
+				message: string,
+				ask_state: object
 			}
 		},
-		end: {
-			hand: object,
-			dealer: object
-		},
-		win_condition: {
-			multiple_conditions: boolean,
-			hand: object[]
+		dealer: {
+			hand: Ask,
+			action: object
 		}
+	},
+	end: {
+		hand: object,
+		dealer: object
+	},
+	win_condition: {
+		multiple_conditions: boolean,
+		hand: object[]
 	}
 }
 

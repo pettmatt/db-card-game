@@ -43,16 +43,16 @@ function App() {
 
 		setStateHistory(list)
 	}
-	
+
 	function progressState(stateEnum: StatesEnum) {
 		const currentPhase = state ? state.phase : 1
 
-		setState((prevState: SetStateAction<State | undefined>) => {
-			if (prevState) {
-				handleStateHistory(prevState as State | undefined)
+		setState((previousState) => {
+			if (previousState) {
+				handleStateHistory(previousState as State)
 				return {
-					...prevState,
-					phase: stateEnum || (currentPhase >= 4) ? 1 : prevState.phase + 1
+					...previousState,
+					phase: stateEnum || (currentPhase >= 4) ? 1 : previousState.phase + 1
 				}
 			} else {
 				console.warn("Cannot progress state, because it wasn't set correctly.")
@@ -65,21 +65,21 @@ function App() {
 		setState(prevState)
 	}
 
-	if (state) {
+	if (!state) {
 		return (
 			<main>
-				<Starting show={stateValidator(state, StatesEnum.Starting)} state={state} progress={progressState} />
-				<Continue show={stateValidator(state, StatesEnum.Continue)} state={state} progress={progressState} />
-				<Game show={stateValidator(state, StatesEnum.Game)} state={state} progress={progressState} />
-				<Result show={stateValidator(state, StatesEnum.Result)} state={state} progress={progressState} />
-				<Back show={stateValidator(state, StatesEnum.Any)} state={state} progress={previousState} />
+				<h2>State declared probably incorrectly</h2>
 			</main>
 		)
 	}
 
 	return (
 		<main>
-			<h2>State declared probably incorrectly</h2>
+			<Starting show={stateValidator(state, StatesEnum.Starting)} state={state} progress={progressState} />
+			<Continue show={stateValidator(state, StatesEnum.Continue)} state={state} progress={progressState} />
+			<Game show={stateValidator(state, StatesEnum.Game)} state={state} progress={progressState} />
+			<Result show={stateValidator(state, StatesEnum.Result)} state={state} progress={progressState} />
+			<Back show={stateValidator(state, StatesEnum.Any)} state={state} progress={previousState} />
 		</main>
 	)
 }

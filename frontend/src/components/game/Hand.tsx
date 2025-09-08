@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import type { Blackjack, GeneralGameProps } from "../../types/interfaces"
+import type { Blackjack, PlayerProps } from "../../types/interfaces"
 
-export default function Hand(props: GeneralGameProps) {
+export default function Hand(props: PlayerProps) {
 	if (!props.state || !props.state.current_match_id) return
-	// Action that is triggered when it's hand's turn
+
 	const [cards, setCards] = useState([])
 
 	if (props.state.current_match_id) {
@@ -24,6 +24,7 @@ export default function Hand(props: GeneralGameProps) {
 
 	return (
 		<div className="hand wrapper">
+			player hand
 			<ul>
 				{cardHand}
 			</ul>

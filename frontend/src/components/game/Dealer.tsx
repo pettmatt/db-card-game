@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
-import type { Blackjack, GeneralGameProps } from "../../types/interfaces"
+import type { Blackjack, DealerProps } from "../../types/interfaces"
 
-export default function Dealer(props: GeneralGameProps) {
+export default function Dealer(props: DealerProps) {
 	if (!props.state || !props.state.current_match_id) return
-	// Action that is triggered when it's dealer's turn
 
 	const [cards, setCards] = useState([])
 	const [deck, setDeck] = useState([])
@@ -37,6 +36,7 @@ export default function Dealer(props: GeneralGameProps) {
 
 	return (
 		<div className="dealer wrapper">
+			Dealer is active
 			<ul className="hand">
 				{cardHand}
 			</ul>

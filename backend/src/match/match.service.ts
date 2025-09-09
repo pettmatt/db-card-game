@@ -16,7 +16,9 @@ export class MatchService {
 
 	async findAll(): Promise<Body<Match | Error>> {
 		return this.matchRepository
-			.find()
+			.find({
+				relations: ["deck", "hand", "dealer"],
+			})
 			.then((result: Match[]) => responseBody(result))
 			.catch((err: Error) => responseBody(err, "fetching all"))
 	}
@@ -26,7 +28,10 @@ export class MatchService {
 		value: number | boolean | string,
 	): Promise<Body<Match | Error>> {
 		return this.matchRepository
-			.findOneBy({ [property]: value })
+			.findOne({
+				where: { [property]: value },
+				relations: ["deck", "hand", "dealer"],
+			})
 			.then((record: Match) => responseBody(record))
 			.catch((err: Error) => responseBody(err, "fetching one"))
 	}

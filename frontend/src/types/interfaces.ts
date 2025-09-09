@@ -5,10 +5,12 @@ export interface Request<T> {
 }
 
 export interface Card {
-	id: number
-	value: number
-	hasSeen: boolean
-	markedToBeDestroyed: boolean
+	id?: number
+	value?: number
+	hasSeen?: boolean
+	markedToBeDestroyed?: boolean
+	ownerId: number
+	ownerType: string
 }
 
 type JsonString = string
@@ -21,12 +23,14 @@ export interface Deck {
 export interface Hand {
 	id: number
 	maxLength: number
+	actions?: Action[]
 }
 
 export interface Dealer {
 	id: number
 	maxLength: number
 	winningCondition: JsonString
+	actions?: Action[]
 }
 
 export interface IBoard {
@@ -35,15 +39,16 @@ export interface IBoard {
 }
 
 export interface Match {
-	id?: number
-	round?: number
-	finished?: boolean
-	maxRounds?: number
-	rounds?: number
-	hand?: any
-	deck?: any
-	dealer?: any
-	stats?: Object
+	id: number
+	round: number
+	finished: boolean
+	maxRounds: number
+	rounds: number
+	cards: Card[]
+	hand: Hand
+	deck: Deck
+	dealer: Dealer
+	// stats?: Object
 }
 
 export interface State {
@@ -105,6 +110,20 @@ export interface GameRules {
 	win_condition: {
 		multiple_conditions: boolean,
 		hand: object[]
+	}
+}
+
+export const ActionEnum = {
+	PLAY_CARD: "play_card",
+	MOVE_CARD: "move_card",
+	CREATE_DECK: "create_deck"
+}
+
+export interface Action {
+	owner: Dealer | Hand | Deck,
+	do: {
+		description: string,
+		value: object
 	}
 }
 

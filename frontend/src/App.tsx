@@ -1,5 +1,5 @@
 import "./App.css"
-import { useState, useEffect, type SetStateAction } from "react"
+import { useState, useEffect } from "react"
 import { type State } from "./types/interfaces"
 import { StatesEnum } from "./types/enums"
 import { stateValidator } from "./services/validate"

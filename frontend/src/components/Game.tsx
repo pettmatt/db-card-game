@@ -6,13 +6,17 @@ import Hand from "./game/Hand"
 
 // For now the logic is handled in memory, later it should be moved to be processed in server
 
+const Turn = Object.freeze({
+	NONE: -1,
+	DEALER: 0,
+	PLAYER: 1,
+})
+
 export default function Game(props: GeneralProps) {
-	if (!props.show || !props.state) {
-		return
-	}
+	if (!props.show || !props.state) return
 
 	const [rules, setRules] = useState<GameRules | undefined>()
-	const [turn, setTurn] = useState("none")
+	const [turn, setTurn] = useState<number>(Turn.NONE) // -1 none
 	const [playerCount, setPlayerCount] = useState(0)
 	const [activateDealer, setActivateDealer] = useState(false)
 
@@ -25,7 +29,7 @@ export default function Game(props: GeneralProps) {
 				setRules(gameRules)
 			})
 			.catch((error: Error) => {
-				// setRules(undefined)
+				setRules(undefined)
 				console.warn("Unable to set game rules:", error)
 			})
 	}, [])
@@ -43,16 +47,17 @@ export default function Game(props: GeneralProps) {
 	}, [turn])
 
 	function startGameSetup() {
+		console.log("Moved to StartGameSetup()")
 		if (!rules) {
-			console.warn("Can't setup game without rules")
+			console.warn("Can't move to setup phase without rules.")
 			return
 		}
 
-		let playerCount = rules.players.max
-		setPlayerCount(playerCount)
+		setPlayerCount(rules.players.max)
 
 		if (rules.players.dealer) {
 			// Proceeds to dealer setup
+			console.log("Dealer activated")
 			setActivateDealer(true)
 		}
 	}
@@ -66,30 +71,32 @@ export default function Game(props: GeneralProps) {
 		return <>
 			{players.map((_, index) => (
 				<Hand key={index} state={props.state} rules={rules}
-					roundActionDone={() => proceedPlayerTurn()}
+					roundActionDone={() => processPlayerTurn()}
 				/>
 			))}
 		</>
 	}
 
 	function DealerWrapper() {
-		if (activateDealer) {
-			return <Dealer state={props.state} rules={rules}
-				setupDone={() => setTurn("player-1")} // When setup is done the game moves to "ping-pong" state until the game is finished.
-				roundActionDone={() => setTurn("player-1")}
-			/>
+		if (!activateDealer) {
+			return <h3>Dealer not activated</h3>
 		}
+
+		return <Dealer state={props.state} rules={rules}
+			// When setup is done the game moves to "ping-pong" state until the game is finished.
+			setupDone={() => setTurn(Turn.PLAYER)}
+			roundActionDone={() => setTurn(Turn.PLAYER)}
+		/>
 	}
 
-	function proceedPlayerTurn() {
+	function processPlayerTurn() {
 		if (playerCount === 1) {
-			setTurn("dealer")
+			setTurn(Turn.DEALER)
 		} else {
-			let index = JSON.parse(turn.split("-")[1]) as number
-			if (index >= playerCount) {
-				setTurn("dealer")
+			if (turn >= playerCount) {
+				setTurn(Turn.DEALER)
 			} else {
-				setTurn(`player-${index + 1}`)
+				setTurn(turn + 1) // If there is more than 1 player, move to next player's turn.
 			}
 		}
 	}

@@ -33,12 +33,8 @@ export async function fetchState(): Promise<State> {
 		leaderboard: []
 	}
 
-	// const deckUrl = `${base}/card/${matchId}/all`
 	const matchUrl = `${base}/match/all`
-
-	// Fetch matches and cards
 	fetchStateSection<Match[]>(state, matchUrl, ["matches"])
-	// fetchStateSection<Card[]>(state, deckUrl, ["match", "deck"])
 
 	return state
 }

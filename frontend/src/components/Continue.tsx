@@ -1,29 +1,25 @@
-import { createNewMatch } from "../services/match"
+import { createNewMatch } from "../services/state"
 import type { GeneralProps } from "../types/interfaces"
 
 export default function Continue(props: GeneralProps) {
-	if (!props.show) {
-		return
-	}
+	if (!props.show) return
 
 	async function createMatch() {
-		// Whenever the database is updated the state should also be updated.
-		const response = await createNewMatch()
-
-		if (!(response instanceof Error)) {
-			props.progress()
-		}
+		createNewMatch(props.state)
+		props.progress()
 	}
 
 	function continueMatch() {
-		const match = props.state.matches.pop()
-		props.state.current_match_id = (match) ? match.id : 0
+		const match = props.state.matches[0]
+		props.state.current_match_id = (match) ? match.id : -1
 		props.progress()
 	}
 
 	return (
 		<div className="flex">
-			<button onClick={continueMatch}>Continue previous match</button>
+			{ props.state.matches.length > 0 &&
+				<button onClick={continueMatch}>Continue previous match</button>
+			}
 			<button onClick={createMatch}>Start a new one</button>
 		</div>
 	)

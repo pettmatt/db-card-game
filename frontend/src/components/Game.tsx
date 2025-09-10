@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-import type { GeneralProps, GameRules } from "../types/interfaces"
+import { useEffect, useRef, useState } from "react"
+import { type GeneralProps, type GameRules, type Action, type Match } from "../types/interfaces"
 import Board from "./game/Board"
 import Dealer from "./game/Dealer"
 import Hand from "./game/Hand"
+import { createNewCard } from "../services/state"
 
 // For now the logic is handled in memory, later it should be moved to be processed in server
 
@@ -20,6 +21,8 @@ export default function Game(props: GeneralProps) {
 	const [playerCount, setPlayerCount] = useState(0)
 	const [activateDealer, setActivateDealer] = useState(false)
 
+	const matchIndex = useRef(0)
+
 	useEffect(() => {
 		fetch("/json/games.json")
 			.then((response) => response.json())
@@ -32,6 +35,16 @@ export default function Game(props: GeneralProps) {
 				setRules(undefined)
 				console.warn("Unable to set game rules:", error)
 			})
+
+		// Make sure state has required values
+		if (props.state.matches) {
+			props.state.matches = props.state.matches.map(match => {
+				if (!match.dealer.actions) {
+					match.dealer.actions = []
+				}
+				return match
+			})
+		}
 	}, [])
 
 	useEffect(() => {
@@ -57,8 +70,32 @@ export default function Game(props: GeneralProps) {
 
 		if (rules.players.dealer) {
 			// Proceeds to dealer setup
-			console.log("Dealer activated")
-			setActivateDealer(true)
+			const id = props.state.current_match_id
+			if (id) {
+				console.log("Dealer activated", id, props.state)
+				
+				const match: Match | undefined = props.state.matches.find((match) => match.id === id)
+				if (!match) {
+					console.warn(`(Game) Match with id of "${id}" couldn't be found.`)
+					return
+				}
+				
+				matchIndex.current = props.state.matches.indexOf(match)
+				const deckLength = props.state.matches[matchIndex.current].deck.maxLength
+				setActivateDealer(true)
+
+				for (let i = 0; i < deckLength; i++) {
+					const createCard: Action = {
+						owner: props.state.matches[matchIndex.current].deck,
+						execute: () => {
+							createNewCard(props.state, props.state.matches[matchIndex.current].deck)
+						}
+					}
+					props.state.matches[matchIndex.current].dealer.actions.push(createCard)
+				}
+
+				console.log("(Game) Generic setup done.")
+			}
 		}
 	}
 
@@ -82,7 +119,14 @@ export default function Game(props: GeneralProps) {
 			return <h3>Dealer not activated</h3>
 		}
 
-		return <Dealer state={props.state} rules={rules}
+		if (!rules || !props.state.current_match_id) {
+			return <h3>Dealer is missing some values</h3>
+		}
+
+		return <Dealer
+			rules={rules}
+			match={props.state.matches[matchIndex.current]}
+			current_match_id={props.state.current_match_id}
 			// When setup is done the game moves to "ping-pong" state until the game is finished.
 			setupDone={() => setTurn(Turn.PLAYER)}
 			roundActionDone={() => setTurn(Turn.PLAYER)}

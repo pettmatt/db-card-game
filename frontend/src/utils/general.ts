@@ -1,41 +1,35 @@
-interface CustomObject {
-	[key: string]: any
+export function setValue(object: any, path: Array<string | number>, value: any) {
+	let modifiedNode = value
+	let key = path[0]
+	let restOfPath = path.slice(1)
+
+	if (restOfPath.length > 0) {
+		modifiedNode = setValue(object[key], restOfPath, value)
+	}
+
+	object[key] = modifiedNode
+	return object
 }
 
-export function setValue(object: CustomObject, path: Array<string | number>, value: any) {
-	let current = object
+export function getValue(object: object, path: string[]) {
+		let current: any = object
 
-	for (let i = 0; i < path.length; i++) {
-		const key = path[i]
-
-		if (
-			current[key] === undefined ||
-			typeof current[key] !== "object" ||
-			current[key] === null
-		) {
-			current[key] = {}
+		for(let i = 0; i < path.length; i++) {
+			let key = path[i]
+			current = current[key]
 		}
 
-		current = current[key]
-	}
-
-	if (Array.isArray(current[path[path.length - 1]])) {
-		current[path[path.length - 1]].push(value)
-	} else {
-		current[path[path.length - 1]] = value
-	}
+		return current
 }
 
-export function getNestedValue(object: CustomObject, startingPoint: string | number = 0): any {
-	let current = object
-	let value = null
+export function getNestedValue(object: object, startingPoint: string | number = 0): any {
+	let current: any = object
 
-	if (typeof object[startingPoint] == "object") {
-		current = current[startingPoint]
-		value = getNestedValue(current)
+	if (typeof current[startingPoint] == "object") {
+		current = getNestedValue(current[startingPoint])
 	} else {
-		value = object[startingPoint]
+		current = current[startingPoint]
 	}
 
-	return value
+	return current
 }
